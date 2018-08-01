@@ -1,7 +1,10 @@
 #include <ESP8266WiFi.h>
  
-const char* ssid = "FC552588";
-const char* password = "fc552588";
+const char* ssid = "WiFi";
+const char* password = "gsch4nu3l";
+
+char* chkPorta;
+char* chkGaragem;
  
 int portaPin = 4; 
 int garagemPin = 5; 
@@ -65,34 +68,41 @@ void loop() {
   client.flush();
  
   // Match the request
- 
-  if (request.indexOf("garagem=on") != -1)  {
-    digitalWrite(garagemPin, LOW);
-  }
-  if (request.indexOf("garagem=on") == -1)  {
-    digitalWrite(garagemPin, HIGH);
-  }
 
 
-  if (request.indexOf("porta=on") != -1)  {
-    digitalWrite(portaPin, HIGH);
-  }
+
+
   if (request.indexOf("porta=on") == -1)  {
     digitalWrite(portaPin, LOW);
+    chkPorta="";
+  }
+  if (request.indexOf("porta=on") != -1)  {
+    digitalWrite(portaPin, HIGH);
+    chkPorta="checked";
   }
 
 
- 
+
+  if (request.indexOf("garagem=on") == -1)  {
+    digitalWrite(garagemPin, LOW);
+    chkGaragem="";
+  }
+  if (request.indexOf("garagem=on") != -1)  {
+    digitalWrite(garagemPin, HIGH);
+    chkGaragem="checked";
+  }
+
+
 // Set ledPin according to the request
 //digitalWrite(ledPin, value);
  
   // Return the response
 
 
-  client.println("HTTP/1.1 200 OK");
-  client.println("Content-Type: text/html");
-  client.println(""); //  do not forget this one
-  client.println("<!DOCTYPE HTML>");
+client.println("HTTP/1.1 200 OK");
+client.println("Content-Type: text/html");
+client.println(""); //  do not forget this one
+client.println("<!DOCTYPE HTML>");
 client.println("<style>");
 client.println("    .onoffswitch {");
 client.println("        position: relative; width: 192px;");
@@ -142,34 +152,34 @@ client.println("        background-color: #34A7C1; ");
 client.println("    }");
 client.println("</style>");
 
+client.println(digitalRead(portaPin));
+client.println(digitalRead(garagemPin));
 client.println(request.indexOf("porta=on"));
 client.println(request.indexOf("garagem=on"));
+
 client.println("<form name=\"form\" action=\"\" method=\"GET\">");
+
 client.println("    <div class=\"onoffswitch\">");
 client.print("        <input onclick=\"document.form.submit()\" type=\"checkbox\" name=\"porta\" class=\"onoffswitch-checkbox\" id=\"porta\"");
-if (request.indexOf("porta=on") != -1){
-    client.print( " checked " );
-}
+client.print( chkPorta );
 client.print(">");
 client.println("        <label class=\"onoffswitch-label\" for=\"porta\">");
 client.println("            <span class=\"onoffswitch-inner\"></span>");
 client.println("            <span class=\"onoffswitch-switch\"></span>");
 client.println("        </label>");
 client.println("</div>");
-client.println("    <div class=\"onoffswitch\">");
 
+client.println("    <div class=\"onoffswitch\">");
 client.print("        <input onclick=\"document.form.submit()\" type=\"checkbox\" name=\"garagem\" class=\"onoffswitch-checkbox\" id=\"garagem\"");
-if (request.indexOf("garagem=on") != -1){
-    client.print( " checked " );
-}
+client.print( chkGaragem );
 client.println(">");
 client.println("        <label class=\"onoffswitch-label\" for=\"garagem\">");
 client.println("            <span class=\"onoffswitch-inner\"></span>");
 client.println("            <span class=\"onoffswitch-switch\"></span>");
-client.println("        </label>   ");     
+client.println("        </label>   ");  
+client.println("</div>");
+
 client.println("</form>");
-
-
 client.println("</html>");
 }
 
